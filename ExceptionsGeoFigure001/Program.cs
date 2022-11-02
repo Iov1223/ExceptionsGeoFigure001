@@ -22,41 +22,30 @@ namespace ExceptionsGeoFigure
     class CheckingParameters
     {
         public decimal value;
-        public bool CheckParameters(string Parameter)
+        public void CheckParameters(string Parameter)
         {
-            try
+            if (Decimal.TryParse(Parameter, out var res))
             {
-                value = decimal.Parse(Parameter);
-                if (value > 0)
+                value = res;
+                if (value <= 0)
                 {
-                    return true;
-                }
-                else
-                {
-                    Console.WriteLine("Значение не может быть отрицательным или ровняться нулю!");
-                    return false;
+                    throw new Exception("Значение не может быть отрицательным или ровняться нулю!");
                 }
             }
-            catch
+            else
             {
-                Console.WriteLine("Ввод должен содержать толко числа!");
-                return false;
+                throw new Exception("Ввод должен содержать толко числа!");
             }
         }
         public decimal ReturnValue()
         {
             return value;
         }
-        public bool CheckTriangle(decimal AB, decimal BC, decimal AC)
+        public void CheckTriangle(decimal AB, decimal BC, decimal AC)
         {
-            if (AB < BC + AC)
+            if (BC + AC <= AB)
             {
-                return true;
-            }
-            else
-            {
-                Console.WriteLine("Сумма первой и второй сторон не может быть меньше основания или равно ему!");
-                return false;
+                throw new Exception("Сумма первой и второй сторон не может быть меньше основания или равно ему!");
             }
         }
     }
@@ -71,9 +60,14 @@ namespace ExceptionsGeoFigure
             {
                 Console.Write("Введите длину: ");
                 string value = Console.ReadLine();
-                if (CP.CheckParameters(value))
+                try
                 {
+                    CP.CheckParameters(value);
                     flag = true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Ошибка: {ex.Message}");
                 }
                 Lengh = CP.ReturnValue();
             } while (!flag);
@@ -82,9 +76,14 @@ namespace ExceptionsGeoFigure
             {
                 Console.Write("Введите высоту: ");
                 string value = Console.ReadLine();
-                if (CP.CheckParameters(value))
+                try
                 {
+                    CP.CheckParameters(value);
                     flag = true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Ошибка: {ex.Message}");
                 }
                 Heigth = CP.ReturnValue();
             } while (!flag);
@@ -128,9 +127,14 @@ namespace ExceptionsGeoFigure
                 {
                     Console.Write("Введите основание треугольника: ");
                     string value = Console.ReadLine();
-                    if (CP.CheckParameters(value))
+                    try
                     {
+                        CP.CheckParameters(value);
                         flag = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Ошибка: {ex.Message}");
                     }
                     AB = CP.ReturnValue();
                 } while (!flag);
@@ -139,9 +143,14 @@ namespace ExceptionsGeoFigure
                 {
                     Console.Write("Введите первую строну треугольника от основания до вершины: ");
                     string value = Console.ReadLine();
-                    if (CP.CheckParameters(value))
+                    try
                     {
+                        CP.CheckParameters(value);
                         flag = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Ошибка: {ex.Message}");
                     }
                     BC = CP.ReturnValue();
                 } while (!flag);
@@ -150,16 +159,26 @@ namespace ExceptionsGeoFigure
                 {
                     Console.Write("Введите вторую строну треугольника от основания до вершины: ");
                     string value = Console.ReadLine();
-                    if (CP.CheckParameters(value))
+                    try
                     {
+                        CP.CheckParameters(value);
                         flag = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Ошибка: {ex.Message}");
                     }
                     AC = CP.ReturnValue();
                 } while (!flag);
-                flag = false;
-                if (CP.CheckTriangle(AB, BC, AC))
+                flag= false;
+                try
                 {
+                    CP.CheckTriangle(AB, BC, AC);
                     flag = true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Ошибка: {ex.Message}");
                 }
             } while (!flag);
             Console.WriteLine();
@@ -205,13 +224,21 @@ namespace ExceptionsGeoFigure
             name = "КРУГ";
             do
             {
-                Console.Write("Введите радиус круга: ");
-                string value = Console.ReadLine();
-                if (CP.CheckParameters(value))
+                do
                 {
-                    flag = true;
-                }
-                Radius = CP.ReturnValue();
+                    Console.Write("Введите радиус круга: ");
+                    string value = Console.ReadLine();
+                    try
+                    {
+                        CP.CheckParameters(value);
+                        flag = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Ошибка: {ex.Message}");
+                    }
+                    Radius = CP.ReturnValue();
+                } while (!flag);
             } while (!flag);
             PI = 3.14m;
         }
@@ -242,34 +269,36 @@ namespace ExceptionsGeoFigure
     }
     class createFigure
     {
-        private int numberOfFigures, count = 0;
+        private decimal numberOfFigures;
+        private int count = 0;
         private GeoFigure[] myArray;
         private string answer, request;
-        private bool isCorrect;
-        private int Request()
+        private bool isCorrect = false;
+        CheckingParameters CP = new CheckingParameters();
+        private void Request()
         {
+            
             do
             {
                 Console.Write("Сколько фигур хотите создать?:\nВвод -> ");
                 request = Console.ReadLine();
-                isCorrect = Int32.TryParse(request, out int res);
-                if (isCorrect)
+                try
                 {
-                    numberOfFigures = Convert.ToInt32(request);
+                    CP.CheckParameters(request);
+                    isCorrect = true;
                 }
-                else
+                catch (Exception ex)
                 {
-                    Console.WriteLine("Неверный ввод. Попробуйте ещё раз: ");
-                    isCorrect = false;
+                    Console.WriteLine($"Ошибка: {ex.Message}");
                 }
+                numberOfFigures = CP.ReturnValue();
             } while (isCorrect == false);
-            return numberOfFigures;
         }
-        private GeoFigure[] createAndWriteToArr()
+        private  void createAndWriteToArr()
         {
-            numberOfFigures = Request();
+            Request();
             Console.WriteLine();
-            myArray = new GeoFigure[numberOfFigures];
+            myArray = new GeoFigure[(int)numberOfFigures];
             do
             {
                 Console.WriteLine("Какую фигуру хотите создать?:\n" +
@@ -278,36 +307,54 @@ namespace ExceptionsGeoFigure
                     "3 - КРУГ");
                 Console.Write("Ввод -> ");
                 answer = Console.ReadLine();
-                Console.WriteLine();
-                if (answer == "1")
+                
+                try
                 {
-                    Rectangle myRectangle = new Rectangle();
-                    myArray[count] = myRectangle;
-                    count++;
+                    try
+                    {
+                        CP.CheckParameters(answer);
+                        isCorrect = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Ошибка: {ex.Message}");
+                    }
+                    answer = Convert.ToString(CP.ReturnValue());
+                    if (answer == "1")
+                    {
+                        Rectangle myRectangle = new Rectangle();
+                        myArray[count] = myRectangle;
+                        count++;
+                    }
+                    else if (answer == "2")
+                    {
+                        Triangle myTriangle = new Triangle();
+                        myArray[count] = myTriangle;
+                        count++;
+                    }
+                    else if (answer == "3")
+                    {
+                        Сircle myСircle = new Сircle();
+                        myArray[count] = myСircle;
+                        count++;
+                    }
+                    else
+                    {
+                        throw new Exception("Такого варианта нет!");
+                    }
                 }
-                else if (answer == "2")
+                catch (Exception ex)
                 {
-                    Triangle myTriangle = new Triangle();
-                    myArray[count] = myTriangle;
-                    count++;
+                    Console.WriteLine($"Ошибка: {ex.Message}");
                 }
-                else if (answer == "3")
-                {
-                    Сircle myСircle = new Сircle();
-                    myArray[count] = myСircle;
-                    count++;
-                }
-                else
-                {
-                    Console.WriteLine("Такого варианта нет, попробуйте ещё раз.\n");
-                }
+                Console.WriteLine("Для продолжения нажмите любую клавишу...");
+                Console.ReadKey();
                 Console.Clear();
             } while (count < numberOfFigures);
-            return myArray;
         }
         public void PrintResult()
         {
-            myArray = createAndWriteToArr();
+            createAndWriteToArr();
             for (int i = 0; i < myArray.Length; i++)
             {
                 Console.WriteLine("{0}) {1}, площадь - {2} и периметр - {3} ",
